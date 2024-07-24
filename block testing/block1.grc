@@ -1,0 +1,205 @@
+options:
+  parameters:
+    author: tharoosha
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: block1
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: Not titled yet
+    window_size: (1000,1000)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: file_name
+  id: variable
+  parameters:
+    comment: ''
+    value: '"./sound.mp3"'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [344, 20.0]
+    rotation: 0
+    state: true
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: '32000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [184, 12]
+    rotation: 0
+    state: enabled
+- name: blocks_file_sink_0
+  id: blocks_file_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    append: 'False'
+    comment: ''
+    file: test.tmp
+    type: byte
+    unbuffered: 'False'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [832, 212.0]
+    rotation: 0
+    state: true
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
+      \ GRC will instantiate the first class it finds\nto get ports and parameters\
+      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
+      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
+      from gnuradio import gr\n\n\nclass blk(gr.sync_block):  # other base classes\
+      \ are basic_block, decim_block, interp_block\n    \"\"\"Embedded Python Block\
+      \ example - a simple multiply const\"\"\"\n\n    def __init__(self):  # only\
+      \ default arguments here\n        \"\"\"arguments to this function show up as\
+      \ parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n            self,\n\
+      \            name='Bypass',   # will show up in GRC\n            in_sig=[np.uint8],\n\
+      \            out_sig=[np.uint8]\n        )\n        # if an attribute with the\
+      \ same name as a parameter is found,\n        # a callback is registered (properties\
+      \ work, too).\n        \n    def work(self, input_items, output_items):\n  \
+      \      \"\"\"example: multiply with constant\"\"\"\n        output_items[0][:]\
+      \ = input_items[0][:] \n        return len(output_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    _io_cache: ('Bypass', 'blk', [], [('0', 'byte', 1)], [('0', 'byte', 1)], 'Embedded
+      Python Block example - a simple multiply const', [])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [576, 176.0]
+    rotation: 0
+    state: true
+- name: epy_block_0_0
+  id: epy_block
+  parameters:
+    FileName: file_name
+    Pkt_len: '60'
+    _source_code: "\"\"\"\nEmbedded Python Block: File Source to Tagged Stream\n\"\
+      \"\"\n\nimport numpy as np\nfrom gnuradio import gr\nimport time\nimport pmt\n\
+      import os.path\nimport sys\nimport base64\n\n\"\"\"\nState definitions\n   \
+      \ 0   idle\n    1   send preamble\n    2   send file data\n    3   send file\
+      \ name\n    4   send post filler\n\"\"\"\n\nclass blk(gr.sync_block):\n    def\
+      \ __init__(self, FileName='None', Pkt_len=52):\n        gr.sync_block.__init__(\n\
+      \            self,\n            name='EPB: File Source to Tagged Stream',\n\
+      \            in_sig=None,\n            out_sig=[np.uint8])\n        self.FileName\
+      \ = FileName\n        self.Pkt_len = Pkt_len\n        self.state = 0      #\
+      \ idle state\n        self.pre_count = 0\n        self.indx = 0\n        self._debug\
+      \ = 0     # debug\n        self.data = \"\"\n\n        if (os.path.exists(self.FileName)):\n\
+      \            # open input file\n            self.f_in = open (self.FileName,\
+      \ 'rb')\n            self._eof = False\n            if (self._debug):\n    \
+      \            print (\"File name:\", self.FileName)\n            self.state =\
+      \ 1\n        else:\n            print(self.FileName, 'does not exist')\n   \
+      \         self._eof = True\n            self.state = 0\n\n        self.char_list\
+      \ = [37,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85, 85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,\
+      \ 85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85, 85,85,85,93]\n        self.c_len\
+      \ = len (self.char_list)\n        # print (self.c_len)\n        self.filler\
+      \ = [37,85,85,85, 35,69,79,70, 85,85,85,85,85,85,85,85, 85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,\
+      \ 85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85, 85,85,85,93]\n        self.f_len\
+      \ = len (self.filler)\n\n    def work(self, input_items, output_items):\n\n\
+      \        if (self.state == 0):\n            # idle\n            return (0)\n\
+      \n        elif (self.state == 1):\n            # send preamble\n           \
+      \ if (self._debug):\n                print (\"state = 1\", self.pre_count)\n\
+      \            key1 = pmt.intern(\"packet_len\")\n            val1 = pmt.from_long(self.c_len)\n\
+      \            self.add_item_tag(0, # Write to output port 0\n               \
+      \ self.indx,   # Index of the tag\n                key1,   # Key of the tag\n\
+      \                val1    # Value of the tag\n                )\n           \
+      \ self.indx += self.c_len\n            i = 0\n            while (i < self.c_len):\n\
+      \                output_items[0][i] = self.char_list[i]\n                i +=\
+      \ 1\n            self.pre_count += 1\n            if (self.pre_count > 64):\n\
+      \                self.pre_count = 0\n                self.state = 2      # send\
+      \ msg\n            return (self.c_len)\n\n        elif (self.state == 2):\n\
+      \            while (not (self._eof)):\n                buff = self.f_in.read\
+      \ (self.Pkt_len)\n                b_len = len(buff)\n                if b_len\
+      \ == 0:\n                    print ('End of file')\n                    self._eof\
+      \ = True\n                    self.f_in.close()\n                    self.state\
+      \ = 3      # send file name\n                    self.pre_count = 0\n      \
+      \              break\n                # convert to Base64\n                encoded\
+      \ = base64.b64encode (buff)\n                e_len = len(encoded)\n        \
+      \        if (self._debug):\n                    print ('b64 length =', e_len)\n\
+      \                key0 = pmt.intern(\"packet_len\")\n                val0 = pmt.from_long(e_len)\n\
+      \                self.add_item_tag(0, # Write to output port 0\n           \
+      \         self.indx,   # Index of the tag\n                    key0,   # Key\
+      \ of the tag\n                    val0    # Value of the tag\n             \
+      \       )\n                self.indx += e_len\n                i = 0\n     \
+      \           while (i < e_len):\n                    output_items[0][i] = encoded[i]\n\
+      \                    i += 1\n                return (e_len)\n\n        elif\
+      \ (self.state == 3):\n            # send file name\n            fn_len = len\
+      \ (self.FileName)\n            key1 = pmt.intern(\"packet_len\")\n         \
+      \   val1 = pmt.from_long(fn_len+8)\n            self.add_item_tag(0, # Write\
+      \ to output port 0\n                self.indx,   # Index of the tag\n      \
+      \          key1,   # Key of the tag\n                val1    # Value of the\
+      \ tag\n                )\n            self.indx += (fn_len+8)\n            i\
+      \ = 0\n            while (i < 8):\n                output_items[0][i] = self.filler[i]\n\
+      \                i += 1\n            j = 0\n            while (i < (fn_len+8)):\n\
+      \                output_items[0][i] = ord(self.FileName[j])\n              \
+      \  i += 1\n                j += 1\n            self.state = 4\n            return\
+      \ (fn_len+8)\n\n        elif (self.state == 4):\n            # send post filler\n\
+      \            if (self._debug):\n                print (\"state = 4\", self.pre_count)\n\
+      \            key1 = pmt.intern(\"packet_len\")\n            val1 = pmt.from_long(self.f_len)\n\
+      \            self.add_item_tag(0, # Write to output port 0\n               \
+      \ self.indx,   # Index of the tag\n                key1,   # Key of the tag\n\
+      \                val1    # Value of the tag\n                )\n           \
+      \ self.indx += self.f_len\n            i = 0\n            while (i < self.f_len):\n\
+      \                output_items[0][i] = self.filler[i]\n                i += 1\n\
+      \            self.pre_count += 1\n            if (self.pre_count > 16):\n  \
+      \              self.pre_count = 0\n                self.state = 0      # idle\n\
+      \            return (self.f_len)\n\n        return (0)\n\n"
+    affinity: ''
+    alias: ''
+    comment: File name should mention in the varibale block
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    _io_cache: '(''EPB: File Source to Tagged Stream'', ''blk'', [(''FileName'', "''None''"),
+      (''Pkt_len'', ''52'')], [], [(''0'', ''byte'', 1)], '''', [''FileName'', ''Pkt_len''])'
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [168, 220.0]
+    rotation: 0
+    state: enabled
+
+connections:
+- [epy_block_0, '0', blocks_file_sink_0, '0']
+- [epy_block_0_0, '0', epy_block_0, '0']
+
+metadata:
+  file_format: 1
